@@ -175,35 +175,43 @@ class ViewBoard:
             base_board.game_won = 1
         
         return
+
+def validate_pos_num(prompt, min, max):
+    while True:
+        try:
+            answer = int(input(prompt))
+        except:
+            print("Not valid input. Min is " + str(min) + ", Max is " + str(max))
+            continue
+
+        if answer < min or answer > max:
+            print("Not in range. Min is " + str(min) + ", Max is " + str(max))
+            continue
+        else:
+            break
+    return answer
         
 
 def set_up():
     #get parameters for board
-    while True:
-        try:
-            length = int(input("Hello welcome to minesweeper. What would you like the length of the board to be? (Max 99 min 1\n"))
-            width = int(input("Width?\n"))
-            bombs = int(input("How many bombs would you like?\n"))
-        except:
-            print("Not valid input. Max length and width is 99. Max amount of bombs is 1000")
-            continue
-        else:
-            break
+    length = validate_pos_num("Hello welcome to minesweeper. What would you like the length of the board to be?\n", 1, 99)
+    width = validate_pos_num("Width?\n", 1, 99)
+    bombs = validate_pos_num("How many bombs would you like?\n", 1, round((length * width)/2))
 
     return [length, width, bombs]
 
 
-def choice_menu():
+def choice_menu(base_board):
 
-    choice = int(input(
+    choice = validate_pos_num(
     """
     Select your choice for this turn:
     1 - Reveal a tile
     2 - Flag a tile
-    3 - Unflag a tile\n"""))
+    3 - Unflag a tile\n""", 1, 3)
 
-    row = int(input("Which row?"))
-    column = int(input("which column?"))
+    row = validate_pos_num("Which row?", 0, base_board.length-1)
+    column = validate_pos_num("which column?", 0, base_board.width-1)
 
     return [choice, row, column]
 
@@ -220,7 +228,7 @@ def play_game(base_board, ViewBoard):
     while (base_board.game_over != 1 and base_board.game_won != 1):
         base_board.print_board()
         ViewBoard.print_board()
-        turn_parameters = choice_menu()
+        turn_parameters = choice_menu(base_board)
 
         if turn_parameters[0] == 1:
             ViewBoard.reveal(base_board, turn_parameters[1], turn_parameters[2])
